@@ -28,21 +28,6 @@ public class MonteCarloView {
     private static final Color ROJO = new Color(190, 55, 55);
     private static final double PI = Math.PI;
 
-    public void mostrarResultados(MonteCarloController.ResultadoSimulacion[] resultados) {
-        System.out.println("==========================================================================");
-        System.out.println(" N          | Pi Estimado      | Error Absoluto   | Tiempo Java (ms)     ");
-        System.out.println("==========================================================================");
-
-        for (MonteCarloController.ResultadoSimulacion resultado : resultados) {
-            System.out.printf("%-11d | %-16.6f | %-16.6f | %-20d%n",
-                    resultado.getN(),
-                    resultado.getPiEstimado(),
-                    resultado.getErrorAbsoluto(),
-                    resultado.getTiempoMs());
-        }
-        System.out.println("==========================================================================");
-    }
-
     public Path guardarResultadosCsv(
             MonteCarloController.ResultadoSimulacion[] resultados,
             Path archivoCsv) throws IOException {

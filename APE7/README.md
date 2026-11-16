@@ -14,7 +14,7 @@ APE7/
 ├── requirements.txt
 ├── Documento/
 ├── Guia/
-├── img/                              # Se genera al ejecutar Java y Python
+├── img/
 │   ├── convergencia_python.png
 │   ├── convergencia_java.png
 │   └── comparativa_java_python.png
@@ -49,13 +49,12 @@ APE7/
 - `python/main.py`: ejecuta las simulaciones, imprime la tabla de Python y
   solicita a la vista la generación de las gráficas.
 - `java/Main.java`: inicia la simulación y delega la presentación en la vista
-  Java.
+  gráfica después de imprimir la tabla.
 - `java/controlador/MonteCarloController.java`: coordina las simulaciones Java
   y reúne sus resultados.
 - `java/modelo/MonteCarloModel.java`: genera puntos aleatorios y calcula la
   estimación de π, el error absoluto y el tiempo en Java.
-- `java/vista/MonteCarloView.java`: presenta en consola la tabla de resultados
-  generada por Java, guarda sus resultados en CSV y crea la gráfica de
+- `java/vista/MonteCarloView.java`: guarda los resultados Java en CSV y crea la gráfica de
   convergencia Java con Java2D.
 - `requirements.txt`: declara NumPy, Pandas y Matplotlib.
 
@@ -88,25 +87,31 @@ Se requiere Python 3 y un JDK instalado. Desde la raíz del proyecto:
 
 ### Java
 
+Con JDK 22 o superior, puedes ejecutar todo desde la carpeta `java` con el
+lanzador de archivos fuente. Compila las clases necesarias al vuelo, sin
+carpeta `out` ni archivos `.class` previos:
+
 ```powershell
-javac -encoding UTF-8 -d .\out .\java\Main.java .\java\controlador\MonteCarloController.java .\java\modelo\MonteCarloModel.java .\java\vista\MonteCarloView.java
-java -cp .\out Main
+Push-Location .\java
+java Main.java
+Pop-Location
 ```
 
-`Main` entrega los resultados del controlador a `MonteCarloView`. La vista
-imprime la tabla, crea `img/convergencia_java.png` y guarda
-`java/output/resultados_java.csv` para que Python pueda usar los mismos datos.
-Si estás en la carpeta `java`, primero recompila las clases antes de ejecutar
-`java -cp . Main`; el comando `java` no compila automáticamente los archivos
-`.java`:
+`Main` imprime la tabla y llama a `MonteCarloView`, que crea
+`img/convergencia_java.png` y guarda `java/output/resultados_java.csv`.
+
+Si prefieres usar `java -cp . Main` o tienes un JDK anterior, primero compila
+los fuentes desde `java` y luego ejecuta la clase:
 
 ```powershell
-javac -encoding UTF-8 Main.java controlador\MonteCarloController.java modelo\MonteCarloModel.java vista\MonteCarloView.java
+Push-Location .\java
+javac -encoding UTF-8 -d . Main.java controlador\MonteCarloController.java modelo\MonteCarloModel.java vista\MonteCarloView.java
 java -cp . Main
+Pop-Location
 ```
-
-También puedes compilar desde la raíz con el primer comando y ejecutar con
-`java -cp .\out Main`.
+El archivo `controlador/MonteCarloController$ResultadoSimulacion.class` también
+lo genera Java porque `ResultadoSimulacion` es una clase anidada del
+controlador; es necesaria y no debe borrarse por separado.
 
 ### Python y comparación
 
@@ -125,70 +130,53 @@ muestra esperados, Python informa el error.
 
 ## Resultados, gráficas y conclusiones
 
-La tabla muestra una ejecución Java seguida de una ejecución Python. Las
-gráficas Java se generan con los resultados de esa ejecución Java, y la
-comparativa consume el CSV producido por Java. Los tiempos se expresan en
-milisegundos. Como ambos programas usan muestras aleatorias, al volver a
-ejecutarlos se actualizan las gráficas y los valores de la tabla pueden cambiar.
+La tabla corresponde a una ejecución de Java seguida por Python. Las imágenes
+Java y Python se generan con esos resultados de ejecución; por la naturaleza
+aleatoria del método, una nueva ejecución puede producir valores y tiempos
+distintos.
 
 | N | π estimado Python | Error Python | Tiempo Python (ms) | π estimado Java | Error Java | Tiempo Java (ms) |
 |---:|---:|---:|---:|---:|---:|---:|
-| 1,000 | 3.156000 | 0.014407 | 51.48 | 3.120000 | 0.021593 | 2 |
-| 10,000 | 3.165200 | 0.023607 | 0.98 | 3.140800 | 0.000793 | 3 |
-| 100,000 | 3.141520 | 0.000073 | 12.85 | 3.140760 | 0.000833 | 19 |
-| 1,000,000 | 3.140332 | 0.001261 | 83.35 | 3.140064 | 0.001529 | 109 |
+| 1,000 | 3.052000 | 0.089593 | 160.03 | 3.136000 | 0.005593 | 1 |
+| 10,000 | 3.139600 | 0.001993 | 1.05 | 3.158800 | 0.017207 | 2 |
+| 100,000 | 3.146280 | 0.004687 | 11.33 | 3.142360 | 0.000767 | 11 |
+| 1,000,000 | 3.140472 | 0.001121 | 277.99 | 3.144736 | 0.003143 | 57 |
 
 ### Convergencia en Python
 
-En esta ejecución el error Python fue menor con `N = 100000` y subió para
-`N = 1000000`. El método converge en términos probabilísticos, pero no
-garantiza que cada aumento de la muestra mejore la estimación observada.
+La gráfica presenta la estimación de π y su error absoluto para los cuatro
+tamaños de muestra. En esta ejecución, el menor error se obtuvo con
+`N = 1000000`.
 
-![Convergencia de la estimación de π y error absoluto en Python](img/convergencia_python.png)
+![Convergencia de Monte Carlo en Python](img/convergencia_python.png)
 
 ### Convergencia en Java
 
-La vista Java genera esta gráfica al ejecutar `Main`, con las estimaciones y
-errores calculados por esa ejecución. En esta corrida, el menor error se obtuvo
-con `N = 10000`.
+La vista Java genera esta gráfica junto con la simulación. En esta ejecución,
+el menor error Java se obtuvo con `N = 100000`.
 
-![Convergencia de la estimación de π y error absoluto en Java](img/convergencia_java.png)
+![Convergencia de Monte Carlo en Java](img/convergencia_java.png)
 
-### Comparación de tiempos y errores
+### Comparación Java-Python
 
-En los valores de esta tabla, Java presentó menor tiempo para `N = 1000`;
-Python fue más rápido para `N = 10000`, `100000` y `1000000`.
-Estas mediciones son de una sola ejecución y no constituyen una comparación
-controlada: Python usa operaciones vectorizadas de NumPy y Java recorre los
-puntos en un bucle.
+Java fue más rápido para `N = 1000`, `100000` y `1000000`; Python fue más
+rápido para `N = 10000`. Son mediciones de una sola ejecución y pueden variar
+según el equipo y las diferencias entre el bucle Java y las operaciones
+vectorizadas de NumPy.
 
-![Comparación de tiempos de ejecución y errores absolutos entre Java y Python](img/comparativa_java_python.png)
+![Comparación de tiempos y errores de Java y Python](img/comparativa_java_python.png)
 
 ### Conclusiones
 
-- La simulación aproxima π contando los puntos que caen dentro del cuarto de
-  círculo y aplica correctamente la fórmula de Monte Carlo.
-- En esta ejecución, el menor error Python se obtuvo con `N = 100000`, y el
-  menor error Java con `N = 10000`. El error no disminuye necesariamente en
-  cada tamaño; el muestreo es aleatorio.
-- Java tuvo menor tiempo para `N = 1000`, y Python para los otros tres tamaños.
-  Los tiempos pueden variar por el equipo, el estado del proceso y las
-  diferencias de implementación entre el bucle Java y NumPy.
-- Python y Java generan muestras independientes, por lo que no se espera que
-  coincidan punto por punto. Para exigir la misma secuencia, habría que definir
-  y compartir explícitamente el algoritmo generador y su semilla.
-
-### Nota sobre la guía
-
-La metodología de la guía solicita estimar π mediante Monte Carlo, que es lo
-que implementa este proyecto. Sin embargo, un criterio de la rúbrica menciona
-el modelo de colas M/M/1, que no aparece en el procedimiento descrito y no está
-implementado aquí. Si la evaluación exige literalmente M/M/1, se necesita
-aclarar ese alcance con el docente; no es el modelo de esta práctica de
-estimación de π.
+- Al aumentar la muestra, la estimación suele acercarse a π, pero el error no
+  tiene que disminuir en cada paso.
+- En esta ejecución, el menor error Python se observó en `N = 1000000` y el
+  menor error Java en `N = 100000`.
+- La comparación de tiempos es orientativa; los programas usan estrategias
+  distintas y las mediciones dependen del entorno de ejecución.
 
 ## Pruebas
 
-No se incluyen pruebas automatizadas en el proyecto. La ejecución de
-Java seguida de `python .\python\main.py` valida ambas simulaciones, la
-transferencia de resultados mediante CSV y la creación de las tres imágenes.
+La compilación y ejecución Java seguida de `python .\python\main.py` comprueba
+el flujo de ambas simulaciones, el CSV compartido y la generación de las tres
+imágenes.
