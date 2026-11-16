@@ -100,20 +100,7 @@ Pop-Location
 `Main` imprime la tabla y llama a `MonteCarloView`, que crea
 `img/convergencia_java.png` y guarda `java/output/resultados_java.csv`.
 
-Si prefieres usar `java -cp . Main` o tienes un JDK anterior, primero compila
-los fuentes desde `java` y luego ejecuta la clase:
-
-```powershell
-Push-Location .\java
-javac -encoding UTF-8 -d . Main.java controlador\MonteCarloController.java modelo\MonteCarloModel.java vista\MonteCarloView.java
-java -cp . Main
-Pop-Location
-```
-El archivo `controlador/MonteCarloController$ResultadoSimulacion.class` también
-lo genera Java porque `ResultadoSimulacion` es una clase anidada del
-controlador; es necesaria y no debe borrarse por separado.
-
-### Python y comparación
+### Python
 
 ```powershell
 python -m venv .venv
@@ -174,9 +161,3 @@ vectorizadas de NumPy.
   menor error Java en `N = 100000`.
 - La comparación de tiempos es orientativa; los programas usan estrategias
   distintas y las mediciones dependen del entorno de ejecución.
-
-## Pruebas
-
-La compilación y ejecución Java seguida de `python .\python\main.py` comprueba
-el flujo de ambas simulaciones, el CSV compartido y la generación de las tres
-imágenes.
