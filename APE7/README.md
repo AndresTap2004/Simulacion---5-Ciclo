@@ -144,15 +144,6 @@ el menor error Java se obtuvo con `N = 100000`.
 
 ![Convergencia de Monte Carlo en Java](img/convergencia_java.png)
 
-### Comparación Java-Python
-
-Java fue más rápido para `N = 1000`, `100000` y `1000000`; Python fue más
-rápido para `N = 10000`. Son mediciones de una sola ejecución y pueden variar
-según el equipo y las diferencias entre el bucle Java y las operaciones
-vectorizadas de NumPy.
-
-![Comparación de tiempos y errores de Java y Python](img/comparativa_java_python.png)
-
 ### Conclusiones
 
 - Al aumentar la muestra, la estimación suele acercarse a π, pero el error no
